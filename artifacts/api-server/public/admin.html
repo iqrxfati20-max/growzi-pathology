@@ -166,6 +166,8 @@
     }
     .btn-pink { background: var(--pink); color: var(--white); }
     .btn-pink:hover { background: var(--pink-dark); }
+    .btn-export { background: #f0fdf4; color: #16a34a; border: 1.5px solid #bbf7d0; }
+    .btn-export:hover { background: #dcfce7; }
     .btn-danger { background: #fee2e2; color: #dc2626; }
     .btn-danger:hover { background: #dc2626; color: var(--white); }
 
@@ -378,6 +380,7 @@
   <div class="toolbar">
     <h2>All Patients</h2>
     <input type="text" class="search-input" id="search" placeholder="Search name or mobile…" oninput="filterTable()" />
+    <button class="btn btn-export" onclick="exportCSV()" title="Download all patient data as CSV">⬇ Export CSV</button>
     <button class="btn btn-pink" onclick="refresh()">↻ Refresh</button>
   </div>
 
@@ -607,6 +610,40 @@
 
   async function refresh() {
     await Promise.all([loadStats(), loadPatients()]);
+  }
+
+  function exportCSV() {
+    if (!allPatients.length) {
+      showToast('No patient data to export');
+      return;
+    }
+    const headers = ['#', 'Name', 'Mobile', 'Referral Code', 'Referred By', 'Points', 'Referrals', 'Tests', 'Registered On'];
+    const rows = allPatients.map((p, i) => [
+      i + 1,
+      csvEsc(p.name),
+      p.mobile,
+      p.referral_code,
+      p.referred_by || '',
+      p.points,
+      p.referral_count,
+      p.test_count,
+      fmtDate(p.created_at),
+    ]);
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const date = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `growzi-patients-${date}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast(`Exported ${allPatients.length} patients`);
+  }
+
+  function csvEsc(val) {
+    const s = String(val);
+    return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s;
   }
 
   function fmtDate(d) {
