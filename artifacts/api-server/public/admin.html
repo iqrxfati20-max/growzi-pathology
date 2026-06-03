@@ -234,11 +234,125 @@
       td, th { padding: 10px 10px; }
       .search-input { width: 160px; }
     }
+
+    /* ── PIN Lock ── */
+    #pin-lock {
+      position: fixed;
+      inset: 0;
+      background: var(--pink-faint);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #pin-lock.hidden { display: none; }
+    .pin-card {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 32px 28px 28px;
+      width: 100%;
+      max-width: 340px;
+      box-shadow: 0 8px 40px rgba(233,30,140,0.15);
+      text-align: center;
+    }
+    .pin-logo { font-size: 42px; margin-bottom: 10px; }
+    .pin-title { font-size: 20px; font-weight: 800; color: var(--text); }
+    .pin-subtitle { font-size: 13px; color: var(--gray); margin-top: 4px; margin-bottom: 24px; }
+    .pin-dots {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .pin-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid var(--pink-light);
+      background: transparent;
+      transition: all 0.15s;
+    }
+    .pin-dot.filled {
+      background: var(--pink);
+      border-color: var(--pink);
+      transform: scale(1.1);
+    }
+    .pin-dot.error {
+      background: #ef4444;
+      border-color: #ef4444;
+      animation: shake 0.3s ease;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+    .pin-numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .pin-key {
+      height: 56px;
+      border: none;
+      border-radius: 12px;
+      background: var(--pink-faint);
+      color: var(--text);
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pin-key:hover { background: var(--pink-light); transform: translateY(-1px); }
+    .pin-key:active { transform: translateY(0) scale(0.96); }
+    .pin-key.zero { grid-column: 2; }
+    .pin-key.del { background: #fee2e2; color: #ef4444; font-size: 16px; }
+    .pin-key.del:hover { background: #fecaca; }
+    .pin-error-msg {
+      margin-top: 16px;
+      font-size: 13px;
+      color: #ef4444;
+      font-weight: 600;
+      min-height: 20px;
+    }
   </style>
 </head>
 <body>
 
 <div id="toast"></div>
+
+<!-- PIN Lock Screen -->
+<div id="pin-lock">
+  <div class="pin-card">
+    <div class="pin-logo">🌸</div>
+    <div class="pin-title">Admin Access</div>
+    <div class="pin-subtitle">Enter your 4-digit PIN to continue</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="d0"></div>
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+    </div>
+    <div class="pin-numpad">
+      <button class="pin-key" onclick="pinPress('1')">1</button>
+      <button class="pin-key" onclick="pinPress('2')">2</button>
+      <button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button>
+      <button class="pin-key" onclick="pinPress('5')">5</button>
+      <button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button>
+      <button class="pin-key" onclick="pinPress('8')">8</button>
+      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <button class="pin-key zero" onclick="pinPress('0')">0</button>
+      <button class="pin-key del" onclick="pinDel()">⌫</button>
+    </div>
+    <div class="pin-error-msg" id="pin-error"></div>
+  </div>
+</div>
 
 <header>
   <div class="brand">🌸 Growzi Pink — Admin</div>
@@ -300,6 +414,64 @@
 </div>
 
 <script>
+  // ── PIN Lock ──
+  const CORRECT_PIN = '1234';
+  let pinEntry = '';
+
+  function pinInit() {
+    if (sessionStorage.getItem('admin_unlocked') === 'yes') {
+      document.getElementById('pin-lock').classList.add('hidden');
+      refresh();
+    }
+  }
+
+  function pinPress(digit) {
+    if (pinEntry.length >= 4) return;
+    pinEntry += digit;
+    updateDots();
+    if (pinEntry.length === 4) {
+      setTimeout(pinCheck, 120);
+    }
+  }
+
+  function pinDel() {
+    pinEntry = pinEntry.slice(0, -1);
+    updateDots();
+    document.getElementById('pin-error').textContent = '';
+  }
+
+  function updateDots() {
+    for (let i = 0; i < 4; i++) {
+      const dot = document.getElementById('d' + i);
+      dot.classList.toggle('filled', i < pinEntry.length);
+      dot.classList.remove('error');
+    }
+  }
+
+  function pinCheck() {
+    if (pinEntry === CORRECT_PIN) {
+      sessionStorage.setItem('admin_unlocked', 'yes');
+      document.getElementById('pin-lock').classList.add('hidden');
+      refresh();
+    } else {
+      for (let i = 0; i < 4; i++) {
+        document.getElementById('d' + i).classList.add('error');
+      }
+      document.getElementById('pin-error').textContent = 'Incorrect PIN. Try again.';
+      setTimeout(() => {
+        pinEntry = '';
+        updateDots();
+      }, 700);
+    }
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (document.getElementById('pin-lock').classList.contains('hidden')) return;
+    if (e.key >= '0' && e.key <= '9') pinPress(e.key);
+    if (e.key === 'Backspace') pinDel();
+  });
+
+  // ── Admin ──
   let allPatients = [];
   let selectedPatient = null;
 
@@ -439,7 +611,7 @@
     if (e.key === 'Enter') submitTest();
   });
 
-  refresh();
+  pinInit();
 </script>
 </body>
 </html>
