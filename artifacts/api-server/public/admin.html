@@ -36,13 +36,19 @@
       box-shadow: 0 2px 12px rgba(233,30,140,0.3);
     }
     header .brand { font-size: 18px; font-weight: 800; }
-    header .badge {
-      background: rgba(255,255,255,0.2);
-      padding: 4px 12px;
+    .lock-btn {
+      background: rgba(255,255,255,0.18);
+      border: 1.5px solid rgba(255,255,255,0.4);
+      color: var(--white);
+      padding: 7px 16px;
       border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      letter-spacing: 0.3px;
     }
+    .lock-btn:hover { background: rgba(255,255,255,0.3); }
 
     .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
 
@@ -356,7 +362,7 @@
 
 <header>
   <div class="brand">🌸 Growzi Pink — Admin</div>
-  <div class="badge">Admin Panel</div>
+  <button class="lock-btn" onclick="lockAdmin()" title="Lock admin panel">🔒 Lock</button>
 </header>
 
 <div class="container">
@@ -463,6 +469,14 @@
         updateDots();
       }, 700);
     }
+  }
+
+  function lockAdmin() {
+    sessionStorage.removeItem('admin_unlocked');
+    pinEntry = '';
+    updateDots();
+    document.getElementById('pin-error').textContent = '';
+    document.getElementById('pin-lock').classList.remove('hidden');
   }
 
   document.addEventListener('keydown', (e) => {
