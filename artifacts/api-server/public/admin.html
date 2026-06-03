@@ -168,8 +168,95 @@
     .btn-pink:hover { background: var(--pink-dark); }
     .btn-export { background: #f0fdf4; color: #16a34a; border: 1.5px solid #bbf7d0; }
     .btn-export:hover { background: #dcfce7; }
+    .btn-wa-green { background: #25D366; color: var(--white); }
+    .btn-wa-green:hover { background: #1aad54; }
+    .btn-wa-outline { background: #f0fdf4; color: #16a34a; border: 1.5px solid #bbf7d0; font-size: 12px; padding: 6px 10px; }
+    .btn-wa-outline:hover { background: #dcfce7; }
     .btn-danger { background: #fee2e2; color: #dc2626; }
     .btn-danger:hover { background: #dc2626; color: var(--white); }
+
+    /* ── Broadcast Modal ── */
+    #broadcast-modal .modal { max-width: 560px; }
+    .bc-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .bc-tag {
+      background: var(--pink-light);
+      color: var(--pink-dark);
+      border: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: monospace;
+      transition: background 0.15s;
+    }
+    .bc-tag:hover { background: #f0b8da; }
+    textarea#bc-message {
+      width: 100%;
+      padding: 11px 14px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      resize: vertical;
+      min-height: 110px;
+      font-family: inherit;
+      line-height: 1.5;
+    }
+    textarea#bc-message:focus { border-color: var(--pink); }
+    .bc-preview {
+      background: #f0fdf4;
+      border: 1.5px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #1a1a1a;
+      margin-top: 10px;
+      min-height: 60px;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    .bc-preview-label { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+    .bc-list {
+      max-height: 260px;
+      overflow-y: auto;
+      border: 1px solid #f3f4f6;
+      border-radius: 8px;
+      margin-top: 12px;
+    }
+    .bc-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid #f9fafb;
+      transition: background 0.15s;
+    }
+    .bc-row:last-child { border-bottom: none; }
+    .bc-row:hover { background: #fdf0f8; }
+    .bc-row .bc-name { font-weight: 600; font-size: 13px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bc-row .bc-num { font-size: 12px; color: var(--gray); }
+    .bc-row .bc-sent { font-size: 11px; font-weight: 700; color: #16a34a; display: none; }
+    .bc-row.sent .bc-sent { display: inline; }
+    .bc-row.sent .btn-wa-outline { display: none; }
+    .bc-progress {
+      background: var(--pink-light);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--pink-dark);
+      margin-top: 10px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .bc-progress.show { display: flex; }
+    .bc-progress-bar-wrap { flex: 1; background: #fff; border-radius: 99px; height: 6px; overflow: hidden; }
+    .bc-progress-bar { height: 100%; background: var(--pink); border-radius: 99px; transition: width 0.3s; }
 
     /* Modal */
     .modal-overlay {
@@ -381,6 +468,7 @@
     <h2>All Patients</h2>
     <input type="text" class="search-input" id="search" placeholder="Search name or mobile…" oninput="filterTable()" />
     <button class="btn btn-export" onclick="exportCSV()" title="Download all patient data as CSV">⬇ Export CSV</button>
+    <button class="btn btn-wa-green" onclick="openBroadcast()">📢 WhatsApp Broadcast</button>
     <button class="btn btn-pink" onclick="refresh()">↻ Refresh</button>
   </div>
 
@@ -402,6 +490,48 @@
         <tr class="empty-row"><td colspan="8">Loading...</td></tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- Broadcast Modal -->
+<div class="modal-overlay" id="broadcast-modal">
+  <div class="modal" style="max-width:560px">
+    <h3>📢 WhatsApp Broadcast</h3>
+    <p style="font-size:13px;color:var(--gray);margin-bottom:12px">Compose a message to send to all <strong id="bc-count">0</strong> registered patients via WhatsApp.</p>
+
+    <div class="form-group" style="margin-bottom:8px">
+      <label>Message <span style="font-weight:400;color:var(--gray)">(personalise with variables)</span></label>
+      <div class="bc-tags">
+        <button class="bc-tag" onclick="insertVar('{name}')">&#123;name&#125;</button>
+        <button class="bc-tag" onclick="insertVar('{points}')">&#123;points&#125;</button>
+        <button class="bc-tag" onclick="insertVar('{code}')">&#123;code&#125;</button>
+      </div>
+      <textarea id="bc-message" placeholder="Hi {name}! You have {points} reward points at Growzi Pink Pathology 🌸 Share your code *{code}* with friends to earn more!" oninput="updatePreview()"></textarea>
+    </div>
+
+    <div class="bc-preview-label">Preview (first patient)</div>
+    <div class="bc-preview" id="bc-preview">Type a message above to see a preview…</div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;margin-bottom:4px">
+      <div style="font-size:13px;font-weight:700">Patients</div>
+      <button class="btn btn-wa-green" style="padding:9px 16px;font-size:13px" onclick="sendAll()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:4px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Send to All
+      </button>
+    </div>
+
+    <div class="bc-list" id="bc-list">
+      <div style="padding:20px;text-align:center;color:var(--gray);font-size:13px">No patients loaded</div>
+    </div>
+
+    <div class="bc-progress" id="bc-progress">
+      <span id="bc-progress-text">Sending…</span>
+      <div class="bc-progress-bar-wrap"><div class="bc-progress-bar" id="bc-progress-bar" style="width:0%"></div></div>
+    </div>
+
+    <div class="modal-footer" style="margin-top:16px">
+      <button class="btn" style="background:#f3f4f6;color:var(--text)" onclick="closeBroadcast()">Close</button>
+    </div>
   </div>
 </div>
 
@@ -653,6 +783,102 @@
   function escHtml(str) {
     return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
   }
+
+  // ── Broadcast ──
+  const DEFAULT_BC_MSG = 'Hi {name}! 🌸 You have *{points} reward points* at Growzi Pink Pathology.\n\nShare your code *{code}* with friends to earn 50 more points per referral!\n\nBook your next test with us today.';
+
+  function openBroadcast() {
+    if (!allPatients.length) { showToast('No patients yet — refresh first'); return; }
+    document.getElementById('bc-count').textContent = allPatients.length;
+    const ta = document.getElementById('bc-message');
+    if (!ta.value) ta.value = DEFAULT_BC_MSG;
+    renderBcList();
+    updatePreview();
+    document.getElementById('bc-progress').classList.remove('show');
+    document.getElementById('broadcast-modal').classList.add('show');
+  }
+
+  function closeBroadcast() {
+    document.getElementById('broadcast-modal').classList.remove('show');
+  }
+
+  function buildMsg(template, patient) {
+    return template
+      .replace(/\{name\}/g, patient.name)
+      .replace(/\{points\}/g, patient.points)
+      .replace(/\{code\}/g, patient.referral_code);
+  }
+
+  function updatePreview() {
+    const tmpl = document.getElementById('bc-message').value;
+    const sample = allPatients[0];
+    const preview = document.getElementById('bc-preview');
+    if (!tmpl.trim()) { preview.textContent = 'Type a message above to see a preview…'; return; }
+    preview.textContent = sample ? buildMsg(tmpl, sample) : tmpl;
+  }
+
+  function insertVar(variable) {
+    const ta = document.getElementById('bc-message');
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    ta.value = ta.value.slice(0, start) + variable + ta.value.slice(end);
+    ta.selectionStart = ta.selectionEnd = start + variable.length;
+    ta.focus();
+    updatePreview();
+  }
+
+  function renderBcList() {
+    const list = document.getElementById('bc-list');
+    const tmpl = document.getElementById('bc-message').value || DEFAULT_BC_MSG;
+    list.innerHTML = allPatients.map((p, i) => `
+      <div class="bc-row" id="bc-row-${i}">
+        <div>
+          <div class="bc-name">${escHtml(p.name)}</div>
+          <div class="bc-num">+91 ${p.mobile}</div>
+        </div>
+        <span class="bc-sent">✓ Opened</span>
+        <button class="btn btn-wa-outline" onclick="sendOne(${i})">Send</button>
+      </div>
+    `).join('');
+  }
+
+  function sendOne(idx) {
+    const p = allPatients[idx];
+    const tmpl = document.getElementById('bc-message').value || DEFAULT_BC_MSG;
+    const msg = buildMsg(tmpl, p);
+    const mobile = '91' + p.mobile.replace(/\D/g, '');
+    window.open(`https://wa.me/${mobile}?text=${encodeURIComponent(msg)}`, '_blank');
+    document.getElementById('bc-row-' + idx)?.classList.add('sent');
+  }
+
+  async function sendAll() {
+    const tmpl = document.getElementById('bc-message').value.trim();
+    if (!tmpl) { showToast('Please write a message first'); return; }
+    if (!allPatients.length) return;
+
+    renderBcList();
+    const progress = document.getElementById('bc-progress');
+    const bar = document.getElementById('bc-progress-bar');
+    const txt = document.getElementById('bc-progress-text');
+    progress.classList.add('show');
+
+    for (let i = 0; i < allPatients.length; i++) {
+      sendOne(i);
+      const pct = Math.round(((i + 1) / allPatients.length) * 100);
+      bar.style.width = pct + '%';
+      txt.textContent = `Opened ${i + 1} of ${allPatients.length}…`;
+      if (i < allPatients.length - 1) await new Promise(r => setTimeout(r, 600));
+    }
+
+    txt.textContent = `✓ All ${allPatients.length} chats opened!`;
+    bar.style.width = '100%';
+  }
+
+  document.getElementById('broadcast-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeBroadcast();
+  });
+
+  document.getElementById('bc-message').addEventListener('input', renderBcList);
 
   document.getElementById('test-modal').addEventListener('click', function(e) {
     if (e.target === this) closeModal();
