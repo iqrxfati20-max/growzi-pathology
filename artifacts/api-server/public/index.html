@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Growzi Pink Pathology Rewards</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink: #e91e8c;
+      --pink-light: #f8d6ec;
+      --pink-dark: #c0136f;
+      --pink-faint: #fdf0f8;
+      --gray: #6b7280;
+      --text: #1a1a2e;
+      --white: #ffffff;
+      --radius: 14px;
+      --shadow: 0 4px 24px rgba(233,30,140,0.12);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--pink-faint);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--pink);
+      color: var(--white);
+      padding: 18px 20px 14px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(233,30,140,0.3);
+    }
+    header .logo { font-size: 11px; letter-spacing: 2px; opacity: 0.85; text-transform: uppercase; }
+    header h1 { font-size: 20px; font-weight: 700; margin-top: 2px; }
+
+    /* ── Nav ── */
+    nav {
+      display: flex;
+      background: var(--white);
+      border-bottom: 2px solid var(--pink-light);
+      overflow-x: auto;
+    }
+    nav button {
+      flex: 1;
+      padding: 14px 8px;
+      border: none;
+      background: none;
+      color: var(--gray);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+    }
+    nav button.active {
+      color: var(--pink);
+      border-bottom-color: var(--pink);
+    }
+
+    /* ── Main ── */
+    main { padding: 20px 16px 40px; max-width: 500px; margin: 0 auto; }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--pink);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+    }
+
+    /* ── Forms ── */
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--gray); margin-bottom: 6px; }
+    input[type=text], input[type=tel] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus { border-color: var(--pink); }
+
+    /* ── Buttons ── */
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-pink {
+      background: var(--pink);
+      color: var(--white);
+    }
+    .btn-pink:hover { background: var(--pink-dark); transform: translateY(-1px); }
+    .btn-pink:active { transform: translateY(0); }
+    .btn-outline {
+      background: var(--white);
+      color: var(--pink);
+      border: 2px solid var(--pink);
+    }
+    .btn-outline:hover { background: var(--pink-light); }
+    .btn-wa {
+      background: #25D366;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-wa:hover { background: #1aad54; transform: translateY(-1px); }
+    .btn-sm {
+      padding: 8px 14px;
+      font-size: 13px;
+      display: inline-block;
+      width: auto;
+    }
+
+    /* ── Hero points ── */
+    .points-hero {
+      text-align: center;
+      padding: 8px 0 4px;
+    }
+    .points-number {
+      font-size: 56px;
+      font-weight: 800;
+      color: var(--pink);
+      line-height: 1;
+    }
+    .points-label { font-size: 14px; color: var(--gray); margin-top: 4px; }
+
+    /* ── Referral code display ── */
+    .referral-box {
+      background: var(--pink-light);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .referral-code {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--pink-dark);
+      letter-spacing: 3px;
+    }
+    .copy-btn {
+      background: var(--pink);
+      color: var(--white);
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .copy-btn:hover { background: var(--pink-dark); }
+    .copy-btn.copied { background: #10b981; }
+
+    /* ── Info rows ── */
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 14px;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .label { color: var(--gray); }
+    .info-row .value { font-weight: 600; }
+
+    /* ── Referral list ── */
+    .referral-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .referral-item:last-child { border-bottom: none; }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--pink-light);
+      color: var(--pink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .referral-name { font-weight: 600; font-size: 14px; }
+    .referral-date { font-size: 12px; color: var(--gray); margin-top: 2px; }
+    .points-badge {
+      margin-left: auto;
+      background: var(--pink-light);
+      color: var(--pink-dark);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* ── Rewards ── */
+    .reward-tier {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .reward-tier:last-child { border-bottom: none; }
+    .reward-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .reward-icon.locked { background: #f3f4f6; }
+    .reward-icon.unlocked { background: var(--pink-light); }
+    .reward-tier .reward-info { flex: 1; }
+    .reward-tier .reward-title { font-weight: 700; font-size: 14px; }
+    .reward-tier .reward-pts { font-size: 12px; color: var(--gray); margin-top: 2px; }
+    .reward-status {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .reward-status.unlocked { background: var(--pink-light); color: var(--pink-dark); }
+    .reward-status.locked { background: #f3f4f6; color: var(--gray); }
+
+    /* ── Empty state ── */
+    .empty {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--gray);
+    }
+    .empty-icon { font-size: 40px; margin-bottom: 10px; }
+    .empty-text { font-size: 14px; }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1a1a2e;
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.3s ease;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ── Register screen ── */
+    #register-screen {
+      min-height: calc(100vh - 60px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 24px 16px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .register-header { text-align: center; margin-bottom: 28px; }
+    .register-header .icon { font-size: 56px; }
+    .register-header h2 { font-size: 24px; font-weight: 800; color: var(--text); margin-top: 10px; }
+    .register-header p { color: var(--gray); margin-top: 6px; font-size: 14px; }
+    .divider {
+      text-align: center;
+      color: var(--gray);
+      font-size: 13px;
+      margin: 14px 0;
+      position: relative;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: calc(50% - 30px);
+      height: 1px;
+      background: #e5e7eb;
+    }
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+
+    .progress-bar-wrap {
+      background: var(--pink-light);
+      border-radius: 99px;
+      height: 8px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: var(--pink);
+      border-radius: 99px;
+      transition: width 0.5s ease;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Register screen (shown when not logged in) -->
+<div id="register-screen" style="display:none">
+  <div class="register-header">
+    <div class="icon">🌸</div>
+    <h2>Growzi Pink Rewards</h2>
+    <p>Register to earn points on every test & referral</p>
+  </div>
+  <div class="card">
+    <div class="card-title">Join Now</div>
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="reg-name" placeholder="Enter your full name" />
+    </div>
+    <div class="form-group">
+      <label>Mobile Number</label>
+      <input type="tel" id="reg-mobile" placeholder="10-digit mobile number" maxlength="15" />
+    </div>
+    <div class="form-group">
+      <label>Referral Code (optional)</label>
+      <input type="text" id="reg-referral" placeholder="Friend's referral code" style="text-transform:uppercase" />
+    </div>
+    <button class="btn btn-pink" onclick="registerPatient()">Create My Account</button>
+    <div class="divider">already registered?</div>
+    <div class="form-group" style="margin-bottom:0">
+      <label>Your Mobile Number</label>
+      <input type="tel" id="login-mobile" placeholder="Enter your mobile to sign in" maxlength="15" />
+    </div>
+    <button class="btn btn-outline" style="margin-top:12px" onclick="loginPatient()">Sign In</button>
+  </div>
+</div>
+
+<!-- App (shown when logged in) -->
+<div id="app-screen" style="display:none">
+  <header>
+    <div class="logo">Growzi Pink Pathology</div>
+    <h1>Rewards Program</h1>
+  </header>
+
+  <nav>
+    <button class="active" onclick="switchTab('home', this)">🏠 Home</button>
+    <button onclick="switchTab('referrals', this)">👥 Referrals</button>
+    <button onclick="switchTab('rewards', this)">🎁 Rewards</button>
+  </nav>
+
+  <main>
+    <!-- Home page -->
+    <div id="page-home" class="page active">
+      <div class="card">
+        <div class="card-title">Points Balance</div>
+        <div class="points-hero">
+          <div class="points-number" id="points-display">0</div>
+          <div class="points-label">Reward Points</div>
+          <div class="progress-bar-wrap" style="margin-top:14px">
+            <div class="progress-bar" id="points-progress" style="width:0%"></div>
+          </div>
+          <div style="font-size:12px;color:var(--gray);margin-top:6px" id="next-reward-label"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Your Referral Code</div>
+        <div class="referral-box">
+          <span class="referral-code" id="referral-code-display">----</span>
+          <button class="copy-btn" id="copy-btn" onclick="copyCode()">Copy</button>
+        </div>
+        <button class="btn btn-wa" style="margin-top:12px" onclick="shareWhatsApp()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+          Share on WhatsApp
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">My Details</div>
+        <div class="info-row"><span class="label">Name</span><span class="value" id="detail-name">—</span></div>
+        <div class="info-row"><span class="label">Mobile</span><span class="value" id="detail-mobile">—</span></div>
+        <div class="info-row"><span class="label">Referred by</span><span class="value" id="detail-referred">—</span></div>
+        <div class="info-row"><span class="label">Member since</span><span class="value" id="detail-since">—</span></div>
+      </div>
+
+      <div class="card" style="background:var(--pink-light);box-shadow:none">
+        <div style="font-size:13px;color:var(--pink-dark);font-weight:600;margin-bottom:8px">How to earn points</div>
+        <div class="info-row" style="border-color:rgba(233,30,140,0.15)"><span class="label" style="color:var(--pink-dark)">✅ Each Pathology Test</span><span class="value" style="color:var(--pink)">+100 pts</span></div>
+        <div class="info-row" style="border-color:rgba(233,30,140,0.15)"><span class="label" style="color:var(--pink-dark)">👥 Each Referral</span><span class="value" style="color:var(--pink)">+50 pts</span></div>
+      </div>
+
+      <button class="btn btn-outline" onclick="signOut()">Sign Out</button>
+    </div>
+
+    <!-- Referrals page -->
+    <div id="page-referrals" class="page">
+      <div class="card">
+        <div class="card-title">My Referrals</div>
+        <div id="referrals-list">
+          <div class="empty">
+            <div class="empty-icon">👥</div>
+            <div class="empty-text">Loading referrals...</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="background:var(--pink-light);box-shadow:none;text-align:center">
+        <p style="font-size:13px;color:var(--pink-dark);margin-bottom:10px">Share your code and earn <strong>50 points</strong> for each friend who registers!</p>
+        <button class="btn btn-pink btn-sm" style="display:inline-block;width:auto;padding:10px 20px" onclick="shareWhatsApp()">
+          Share Code
+        </button>
+      </div>
+    </div>
+
+    <!-- Rewards page -->
+    <div id="page-rewards" class="page">
+      <div class="card">
+        <div class="card-title">Your Points: <span id="rewards-points" style="color:var(--text);font-size:14px">0</span></div>
+        <div id="rewards-list"></div>
+      </div>
+      <div class="card" style="background:var(--pink-light);box-shadow:none">
+        <div style="font-size:13px;color:var(--pink-dark);font-weight:600;margin-bottom:6px">Redeem your points</div>
+        <p style="font-size:13px;color:var(--pink-dark)">Visit any Growzi Pink Pathology lab with your referral code to redeem rewards. Our staff will verify and process your request.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const REWARDS = [
+    { pts: 100,  icon: '🧪', title: 'Free Urine Test' },
+    { pts: 200,  icon: '🩸', title: 'Free Blood CBC' },
+    { pts: 500,  icon: '💊', title: '50% off Any Test' },
+    { pts: 1000, icon: '🏆', title: 'Free Full Body Checkup' },
+    { pts: 2000, icon: '👑', title: 'VIP Health Package' },
+  ];
+
+  let currentPatient = null;
+
+  async function api(url, opts = {}) {
+    const r = await fetch('/api' + url, {
+      headers: { 'Content-Type': 'application/json' },
+      ...opts,
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({ error: 'Request failed' }));
+      throw new Error(err.error || 'Request failed');
+    }
+    return r.json();
+  }
+
+  function showToast(msg, duration = 2500) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), duration);
+  }
+
+  function init() {
+    const saved = localStorage.getItem('growzi_patient');
+    if (saved) {
+      try {
+        currentPatient = JSON.parse(saved);
+        showApp();
+      } catch {
+        localStorage.removeItem('growzi_patient');
+        showRegister();
+      }
+    } else {
+      showRegister();
+    }
+  }
+
+  function showRegister() {
+    document.getElementById('register-screen').style.display = 'flex';
+    document.getElementById('app-screen').style.display = 'none';
+  }
+
+  function showApp() {
+    document.getElementById('register-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+    renderHome();
+    renderRewards();
+  }
+
+  function switchTab(name, btn) {
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    if (name === 'referrals') loadReferrals();
+  }
+
+  async function registerPatient() {
+    const name = document.getElementById('reg-name').value.trim();
+    const mobile = document.getElementById('reg-mobile').value.trim();
+    const referral = document.getElementById('reg-referral').value.trim().toUpperCase();
+    if (!name) { showToast('Please enter your name'); return; }
+    if (!mobile) { showToast('Please enter your mobile number'); return; }
+    try {
+      const patient = await api('/patients/register', {
+        method: 'POST',
+        body: JSON.stringify({ name, mobile, referral_code_used: referral || undefined }),
+      });
+      currentPatient = patient;
+      localStorage.setItem('growzi_patient', JSON.stringify(patient));
+      showToast('Welcome to Growzi Rewards! 🎉');
+      showApp();
+    } catch (e) {
+      showToast(e.message);
+    }
+  }
+
+  async function loginPatient() {
+    const mobile = document.getElementById('login-mobile').value.trim();
+    if (!mobile) { showToast('Please enter your mobile number'); return; }
+    try {
+      const patient = await api('/patients/lookup?mobile=' + encodeURIComponent(mobile));
+      currentPatient = patient;
+      localStorage.setItem('growzi_patient', JSON.stringify(patient));
+      showToast('Welcome back! 👋');
+      showApp();
+    } catch (e) {
+      showToast(e.message);
+    }
+  }
+
+  function signOut() {
+    localStorage.removeItem('growzi_patient');
+    currentPatient = null;
+    showRegister();
+  }
+
+  function renderHome() {
+    const p = currentPatient;
+    const pts = p.points || 0;
+
+    document.getElementById('points-display').textContent = pts;
+    document.getElementById('referral-code-display').textContent = p.referral_code;
+    document.getElementById('detail-name').textContent = p.name;
+    document.getElementById('detail-mobile').textContent = p.mobile;
+    document.getElementById('detail-referred').textContent = p.referred_by || 'None';
+    document.getElementById('detail-since').textContent = new Date(p.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+    const next = REWARDS.find(r => r.pts > pts);
+    if (next) {
+      const pct = Math.min((pts / next.pts) * 100, 100);
+      document.getElementById('points-progress').style.width = pct + '%';
+      document.getElementById('next-reward-label').textContent = `${next.pts - pts} more points for ${next.title}`;
+    } else {
+      document.getElementById('points-progress').style.width = '100%';
+      document.getElementById('next-reward-label').textContent = 'You have unlocked all rewards!';
+    }
+  }
+
+  async function loadReferrals() {
+    try {
+      const data = await api('/patients/' + currentPatient.id + '/referrals');
+      const list = document.getElementById('referrals-list');
+      if (!data.referrals.length) {
+        list.innerHTML = `<div class="empty"><div class="empty-icon">👥</div><div class="empty-text">No referrals yet. Share your code!</div></div>`;
+        return;
+      }
+      list.innerHTML = data.referrals.map(r => `
+        <div class="referral-item">
+          <div class="avatar">${r.name[0].toUpperCase()}</div>
+          <div>
+            <div class="referral-name">${r.name}</div>
+            <div class="referral-date">${new Date(r.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+          </div>
+          <div class="points-badge">+50 pts</div>
+        </div>
+      `).join('');
+    } catch {
+      document.getElementById('referrals-list').innerHTML = `<div class="empty"><div class="empty-text">Could not load referrals</div></div>`;
+    }
+  }
+
+  function renderRewards() {
+    const pts = currentPatient.points || 0;
+    document.getElementById('rewards-points').textContent = pts + ' pts';
+    document.getElementById('rewards-list').innerHTML = REWARDS.map(r => {
+      const unlocked = pts >= r.pts;
+      return `
+        <div class="reward-tier">
+          <div class="reward-icon ${unlocked ? 'unlocked' : 'locked'}">${r.icon}</div>
+          <div class="reward-info">
+            <div class="reward-title">${r.title}</div>
+            <div class="reward-pts">${r.pts} points required</div>
+          </div>
+          <span class="reward-status ${unlocked ? 'unlocked' : 'locked'}">${unlocked ? 'Unlocked' : 'Locked'}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function copyCode() {
+    const code = currentPatient.referral_code;
+    navigator.clipboard.writeText(code).then(() => {
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  function shareWhatsApp() {
+    const code = currentPatient.referral_code;
+    const name = currentPatient.name;
+    const msg = `Hi! I use *Growzi Pink Pathology* for all my lab tests 🌸\n\nUse my referral code *${code}* when you register to start earning reward points!\n\nRegister here: ${window.location.origin}`;
+    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+  }
+
+  init();
+</script>
+</body>
+</html>

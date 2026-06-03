@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Growzi Pink Rewards</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink: #e91e8c;
+      --pink-light: #f8d6ec;
+      --pink-dark: #c0136f;
+      --pink-faint: #fdf0f8;
+      --gray: #6b7280;
+      --text: #1a1a2e;
+      --white: #ffffff;
+      --radius: 12px;
+      --shadow: 0 2px 16px rgba(233,30,140,0.1);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f9fafb;
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--pink);
+      color: var(--white);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 12px rgba(233,30,140,0.3);
+    }
+    header .brand { font-size: 18px; font-weight: 800; }
+    header .badge {
+      background: rgba(255,255,255,0.2);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border-left: 4px solid var(--pink);
+    }
+    .stat-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--gray); }
+    .stat-value { font-size: 36px; font-weight: 800; color: var(--pink); margin-top: 6px; }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .toolbar h2 { font-size: 18px; font-weight: 700; flex: 1; }
+    .search-input {
+      padding: 9px 14px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      width: 220px;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--pink); }
+
+    /* Table */
+    .table-wrap {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--gray);
+      background: #f9fafb;
+      border-bottom: 1px solid #f3f4f6;
+      white-space: nowrap;
+    }
+    td {
+      padding: 14px 16px;
+      font-size: 14px;
+      border-bottom: 1px solid #f9fafb;
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fdf0f8; }
+
+    .patient-name { font-weight: 700; color: var(--text); }
+    .patient-mobile { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+    .code-chip {
+      background: var(--pink-light);
+      color: var(--pink-dark);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      font-family: monospace;
+    }
+
+    .pts-badge {
+      background: linear-gradient(135deg, var(--pink-light), #fce4f5);
+      color: var(--pink-dark);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-block;
+    }
+
+    .count-badge {
+      display: inline-block;
+      min-width: 26px;
+      height: 26px;
+      line-height: 26px;
+      text-align: center;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .count-badge.refs { background: #dbeafe; color: #1d4ed8; }
+    .count-badge.tests { background: #d1fae5; color: #065f46; }
+
+    .btn {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-pink { background: var(--pink); color: var(--white); }
+    .btn-pink:hover { background: var(--pink-dark); }
+    .btn-danger { background: #fee2e2; color: #dc2626; }
+    .btn-danger:hover { background: #dc2626; color: var(--white); }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    .modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+    .modal .patient-info {
+      background: var(--pink-light);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+    .modal .patient-info strong { color: var(--pink-dark); display: block; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--gray); margin-bottom: 6px; }
+    input[type=text] {
+      width: 100%;
+      padding: 11px 14px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+    input:focus { border-color: var(--pink); }
+    .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
+    .modal-footer .btn { flex: 1; padding: 12px; }
+
+    /* Empty */
+    .empty-row td { text-align: center; padding: 40px; color: var(--gray); font-size: 14px; }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1a1a2e;
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.3s ease;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    .since { font-size: 12px; color: var(--gray); }
+
+    @media (max-width: 700px) {
+      .hide-mobile { display: none; }
+      td, th { padding: 10px 10px; }
+      .search-input { width: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<header>
+  <div class="brand">🌸 Growzi Pink — Admin</div>
+  <div class="badge">Admin Panel</div>
+</header>
+
+<div class="container">
+  <!-- Stats -->
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total Patients</div><div class="stat-value" id="stat-patients">—</div></div>
+    <div class="stat-card"><div class="stat-label">Total Referrals</div><div class="stat-value" id="stat-referrals">—</div></div>
+    <div class="stat-card"><div class="stat-label">Tests Done</div><div class="stat-value" id="stat-tests">—</div></div>
+    <div class="stat-card"><div class="stat-label">Points Awarded</div><div class="stat-value" id="stat-points">—</div></div>
+  </div>
+
+  <!-- Patients table -->
+  <div class="toolbar">
+    <h2>All Patients</h2>
+    <input type="text" class="search-input" id="search" placeholder="Search name or mobile…" oninput="filterTable()" />
+    <button class="btn btn-pink" onclick="refresh()">↻ Refresh</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Patient</th>
+          <th>Referral Code</th>
+          <th class="hide-mobile">Points</th>
+          <th class="hide-mobile">Refs</th>
+          <th class="hide-mobile">Tests</th>
+          <th class="hide-mobile">Since</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="patient-tbody">
+        <tr class="empty-row"><td colspan="8">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add Test Modal -->
+<div class="modal-overlay" id="test-modal">
+  <div class="modal">
+    <h3>Add Test</h3>
+    <div class="patient-info" id="modal-patient-info">Patient name</div>
+    <div class="form-group">
+      <label>Test Name</label>
+      <input type="text" id="test-name-input" placeholder="e.g. CBC, Lipid Profile, HbA1c…" />
+    </div>
+    <p style="font-size:13px;color:var(--gray)">This will award <strong style="color:var(--pink)">100 points</strong> to the patient.</p>
+    <div class="modal-footer">
+      <button class="btn" style="background:#f3f4f6;color:var(--text)" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-pink" onclick="submitTest()">Add Test (+100 pts)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let allPatients = [];
+  let selectedPatient = null;
+
+  async function api(url, opts = {}) {
+    const r = await fetch('/api' + url, {
+      headers: { 'Content-Type': 'application/json' },
+      ...opts,
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({ error: 'Request failed' }));
+      throw new Error(err.error || 'Request failed');
+    }
+    return r.json();
+  }
+
+  function showToast(msg, duration = 2500) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), duration);
+  }
+
+  async function loadStats() {
+    try {
+      const s = await api('/admin/stats');
+      document.getElementById('stat-patients').textContent = s.totalPatients;
+      document.getElementById('stat-referrals').textContent = s.totalReferrals;
+      document.getElementById('stat-tests').textContent = s.totalTests;
+      document.getElementById('stat-points').textContent = s.totalPoints.toLocaleString();
+    } catch {}
+  }
+
+  async function loadPatients() {
+    try {
+      const data = await api('/admin/patients');
+      allPatients = data.patients;
+      renderTable(allPatients);
+    } catch (e) {
+      document.getElementById('patient-tbody').innerHTML = `<tr class="empty-row"><td colspan="8">Failed to load patients</td></tr>`;
+    }
+  }
+
+  function renderTable(patients) {
+    const tbody = document.getElementById('patient-tbody');
+    if (!patients.length) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="8">No patients registered yet</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = patients.map((p, i) => `
+      <tr data-id="${p.id}">
+        <td style="color:var(--gray);font-size:12px">${i + 1}</td>
+        <td>
+          <div class="patient-name">${escHtml(p.name)}</div>
+          <div class="patient-mobile">${p.mobile}</div>
+        </td>
+        <td><span class="code-chip">${p.referral_code}</span></td>
+        <td class="hide-mobile"><span class="pts-badge">${p.points} pts</span></td>
+        <td class="hide-mobile"><span class="count-badge refs">${p.referral_count}</span></td>
+        <td class="hide-mobile"><span class="count-badge tests">${p.test_count}</span></td>
+        <td class="hide-mobile"><span class="since">${fmtDate(p.created_at)}</span></td>
+        <td>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-pink" onclick="openAddTest(${p.id}, '${escHtml(p.name)}', ${p.points})">+ Test</button>
+            <button class="btn btn-danger" onclick="deletePatient(${p.id}, '${escHtml(p.name)}')">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function filterTable() {
+    const q = document.getElementById('search').value.toLowerCase();
+    const filtered = allPatients.filter(p =>
+      p.name.toLowerCase().includes(q) || p.mobile.includes(q) || p.referral_code.toLowerCase().includes(q)
+    );
+    renderTable(filtered);
+  }
+
+  function openAddTest(id, name, pts) {
+    selectedPatient = { id, name, pts };
+    document.getElementById('modal-patient-info').innerHTML = `<strong>${name}</strong>Current points: ${pts}`;
+    document.getElementById('test-name-input').value = '';
+    document.getElementById('test-modal').classList.add('show');
+    setTimeout(() => document.getElementById('test-name-input').focus(), 100);
+  }
+
+  function closeModal() {
+    document.getElementById('test-modal').classList.remove('show');
+    selectedPatient = null;
+  }
+
+  async function submitTest() {
+    const testName = document.getElementById('test-name-input').value.trim();
+    if (!testName) { showToast('Please enter a test name'); return; }
+    if (!selectedPatient) return;
+    try {
+      const result = await api('/admin/tests', {
+        method: 'POST',
+        body: JSON.stringify({ patient_id: selectedPatient.id, test_name: testName }),
+      });
+      closeModal();
+      showToast(`Test added! ${selectedPatient.name} now has ${result.new_total} points 🎉`);
+      refresh();
+    } catch (e) {
+      showToast(e.message);
+    }
+  }
+
+  async function deletePatient(id, name) {
+    if (!confirm(`Delete patient "${name}"? This cannot be undone.`)) return;
+    try {
+      await api('/admin/patients/' + id, { method: 'DELETE' });
+      showToast(`${name} has been removed`);
+      refresh();
+    } catch (e) {
+      showToast(e.message);
+    }
+  }
+
+  async function refresh() {
+    await Promise.all([loadStats(), loadPatients()]);
+  }
+
+  function fmtDate(d) {
+    return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+
+  document.getElementById('test-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  document.getElementById('test-name-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitTest();
+  });
+
+  refresh();
+</script>
+</body>
+</html>
