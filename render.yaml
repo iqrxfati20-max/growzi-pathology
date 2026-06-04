@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: growzi-pathology
+    runtime: node
+    rootDir: artifacts/api-server
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+    disk:
+      name: growzi-data
+      mountPath: /data
+      sizeGB: 1

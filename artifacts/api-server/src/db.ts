@@ -1,7 +1,11 @@
 import Database from "better-sqlite3";
 import path from "path";
 
-const DB_PATH = process.env.DB_PATH || path.join(process.cwd(), "growzi.db");
+const defaultDbPath = process.env.NODE_ENV === "production"
+  ? "/data/growzi.db"
+  : path.join(process.cwd(), "growzi.db");
+
+const DB_PATH = process.env.DB_PATH || defaultDbPath;
 
 const db = new Database(DB_PATH);
 
