@@ -8,6 +8,7 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+    healthCheckPath: /api/healthz
     disk:
       name: growzi-data
       mountPath: /data
